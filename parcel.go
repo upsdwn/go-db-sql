@@ -32,13 +32,13 @@ func (s ParcelStore) Add(p Parcel) (int, error) {
 func (s ParcelStore) Get(number int) (Parcel, error) {
 	// реализуйте чтение строки по заданному number
 	// здесь из таблицы должна вернуться только одна строка
-	query := `SELECT number, client, status, address FROM parcel WHERE number = ?`
+	query := `SELECT number, client, status, address, created_at FROM parcel WHERE number = ?`
 	row := s.db.QueryRow(query, number)
 
 	// заполните объект Parcel данными из таблицы
 	p := Parcel{}
 
-	err := row.Scan(&p.Number, &p.Client, &p.Status, &p.Address)
+	err := row.Scan(&p.Number, &p.Client, &p.Status, &p.Address, &p.CreatedAt)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return Parcel{}, fmt.Errorf("посылка с номером %d не найдена", number)
@@ -52,7 +52,7 @@ func (s ParcelStore) Get(number int) (Parcel, error) {
 func (s ParcelStore) GetByClient(client int) ([]Parcel, error) {
 	// реализуйте чтение строк из таблицы parcel по заданному client
 	// здесь из таблицы может вернуться несколько строк
-	query := `SELECT number, client, status, address FROM parcel WHERE client = ?`
+	query := `SELECT number, client, status, address, created_at FROM parcel WHERE client = ?`
 	rows, err := s.db.Query(query, client)
 	if err != nil {
 		return nil, fmt.Errorf("ошибка получения посылок %w", err)
@@ -63,7 +63,7 @@ func (s ParcelStore) GetByClient(client int) ([]Parcel, error) {
 
 	for rows.Next() {
 		p := Parcel{}
-		err := rows.Scan(&p.Number, &p.Client, &p.Status, &p.Address)
+		err := rows.Scan(&p.Number, &p.Client, &p.Status, &p.Address, &p.CreatedAt)
 		if err != nil {
 			return nil, fmt.Errorf("ошибка скана %w", err)
 		}
